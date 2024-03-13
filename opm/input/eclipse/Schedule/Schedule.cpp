@@ -265,6 +265,7 @@ Schedule::Schedule(const Deck& deck, const EclipseState& es, const std::optional
         result.completed_cells = CompletedCells::serializationTestObject();
         result.current_report_step = 0;
         result.simUpdateFromPython = std::make_shared<SimulatorUpdate>(SimulatorUpdate::serializationTestObject());
+        result.wellPIPointer = nullptr;
 
         return result;
     }
@@ -702,6 +703,29 @@ void Schedule::iterateScheduleSection(std::size_t load_start, std::size_t load_e
                 (void) cell;
             }
         }
+    }
+
+    void Schedule::set_welpi(const std::string& well_name, std::size_t report_step, double welpi_value) {
+        //Todo: Unify this with the other functions
+        /*std::time_t start_time = std::chrono::system_clock::to_time_t(this->snapshots[report_step].start_time());
+        Opm::Action::ActionX action("welpi", 1, 0.0, start_time);
+        DeckItem wellItem("WELL_NAME", std::string());
+        wellItem.push_back("?");
+        DeckItem welpiValue("STEADY_STATE_PRODUCTIVITY_OR_INJECTIVITY_INDEX_VALUE", double(), {},{}); //Dimension vectors
+        welpiValue.push_back(welpi_value);
+        DeckRecord deckRecord;
+        deckRecord.addItem(std::move(wellItem));
+        deckRecord.addItem(std::move(welpiValue));
+        ParserKeyword parserKeyword("WELPI", KeywordSize(SLASH_TERMINATED));
+
+        DeckKeyword action_keyword(parserKeyword);
+        action_keyword.addRecord(std::move(deckRecord));
+        action.addKeyword(action_keyword);
+        std::vector<std::string> matching_wells = {well_name};
+        std::unordered_map<std::string, double> target_wellpi;
+        target_wellpi[well_name] = (*(this->wellPIPointer))[well_name];
+        SimulatorUpdate delta = this->applyAction(report_step, action, matching_wells, target_wellpi);
+        this->simUpdateFromPython->append(delta);*/
     }
 
     void Schedule::shut_well(const std::string& well_name, std::size_t report_step) {
@@ -1439,6 +1463,14 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
         ScheduleGrid grid(this->completed_cells);
         SimulatorUpdate sim_update;
         std::unordered_map<std::string, double> target_wellpi;
+        bool actionx_mode = false;
+        // Get the well production indices from the simulation up until now
+        // and use in the calculation for the overall production indices.
+        // This is done by passing actionx_mode = true to the handleKeyword method
+        if (this->wellPIPointer) {
+            target_wellpi = *(this->wellPIPointer);
+            actionx_mode = true;
+        }
         std::vector<std::string> matching_wells;
         const std::string prefix = "| "; /* logger prefix string */
         this->snapshots.resize(reportStep + 1);
@@ -1454,7 +1486,7 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
                                     errors,
                                     grid,
                                     matching_wells,
-                                    /*actionx_mode=*/false,
+                                    actionx_mode,
                                     &sim_update,
                                     &target_wellpi,
                                     wpimult_global_factor);    

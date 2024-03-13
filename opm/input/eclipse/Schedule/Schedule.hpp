@@ -203,6 +203,7 @@ namespace Opm
         std::unordered_set<int> getAquiferFluxSchedule() const;
         std::vector<Well> getWells(std::size_t timeStep) const;
         std::vector<Well> getWellsatEnd() const;
+        void set_welpi(const std::string& well_name, std::size_t report_step, double welpi_value);
         void shut_well(const std::string& well_name, std::size_t report_step);
         void shut_well(const std::string& well_name);
         void stop_well(const std::string& well_name, std::size_t report_step);
@@ -453,6 +454,7 @@ namespace Opm
         friend std::ostream& operator<<(std::ostream& os, const Schedule& sched);
         void dump_deck(std::ostream& os) const;
 
+        std::shared_ptr<std::unordered_map<std::string, double>> wellPIPointer = nullptr;
     private:
         friend class HandlerContext;
 
