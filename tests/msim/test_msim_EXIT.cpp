@@ -79,7 +79,13 @@ double prod_wpr_P4(const EclipseState&  es, const Schedule& /* sched */, const S
 }
 
 BOOST_AUTO_TEST_CASE(MSIM_EXIT_TEST) {
-    std::string deck_file = "EXIT_TEST.DATA";
+    std::vector<std::string> decks = {"EXIT_TEST.DATA"};
+
+#ifdef EMBEDDED_PYTHON
+    decks.push_back("EXIT_TEST_PYACTION.DATA");
+#endif
+
+    for (auto&& deck_file : decks) {
     Opm::Parser parser;
     auto python = std::make_shared<Opm::Python>();
 
@@ -106,5 +112,6 @@ BOOST_AUTO_TEST_CASE(MSIM_EXIT_TEST) {
         auto exit_status = msim.schedule.exitStatus();
         BOOST_CHECK( exit_status.has_value() );
         BOOST_CHECK_EQUAL(exit_status.value(), 99);
+    }
     }
 }

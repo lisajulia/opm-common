@@ -697,6 +697,8 @@ if(ENABLE_ECL_OUTPUT)
           tests/MSW.DATA
           tests/MSW_2WELSEGS.DATA
           tests/EXIT_TEST.DATA
+          tests/EXIT_TEST_PYACTION.DATA
+          tests/exit.py
           tests/action_syntax_error.py
           tests/EMBEDDED_PYTHON.DATA
           tests/ACTIONX_M1.DATA
