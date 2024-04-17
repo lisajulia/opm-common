@@ -19,7 +19,17 @@ namespace {
 void python::common::export_ScheduleState(py::module& module) {
 
     py::class_<ScheduleState>(module, "ScheduleState")
-        .def_property_readonly("nupcol", py::overload_cast<>(&ScheduleState::nupcol, py::const_))
-        .def("group", &get_group, ref_internal)
+        .def_property_readonly("nupcol", py::overload_cast<>(&ScheduleState::nupcol, py::const_), R"(
+            The NUPCOL value at this Schedule State. This is a positive integer that defines the maximum number of Newton iterations used to update well targets within a time step.
+        )")
+        .def("group", &get_group, ref_internal, R"(
+        Get the group with the specified name from the schedule state.
+
+        Args:
+            group_name (str): The name of the group to retrieve from the schedule state.
+
+        Returns:
+            group: The group with the specified name from the schedule state.
+        )")
         ;
 }
