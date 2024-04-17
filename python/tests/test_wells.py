@@ -34,7 +34,7 @@ class TestWells(unittest.TestCase):
         deck = Parser().parse(test_path('spe3/SPE3CASE1.DATA'))
         state = EclipseState(deck)
         cls.sch = Schedule( deck, state )
-        cls.timesteps = cls.sch.timesteps
+        cls.reportsteps = cls.sch.reportsteps
 
     def inje(self, wells):
         return next(iter(filter(injector, wells)))
@@ -122,7 +122,7 @@ class TestWells(unittest.TestCase):
 
 
     def testCompletions(self):
-        num_steps = len( self.sch.timesteps )
+        num_steps = len( self.sch.reportsteps )
         w0 = self.sch.get_wells(num_steps - 1)[0]
         c0,c1 = w0.connections()
 

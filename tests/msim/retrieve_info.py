@@ -7,7 +7,7 @@ summary_state = opm_embedded.current_summary_state
 # Get info from the Schedule Object.
 start = schedule.start
 end = schedule.end
-timesteps = schedule.timesteps
+reportsteps = schedule.reportsteps
 length = schedule.__len__()
 injection_properties = schedule.get_injection_properties("INJ",1)
 production_properties = schedule.get_production_properties("PROD1",1)

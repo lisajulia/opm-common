@@ -118,7 +118,7 @@ namespace {
         return datetime(s.posixEndTime());
     }
 
-    std::vector<system_clock::time_point> get_timesteps( const Schedule& s ) {
+    std::vector<system_clock::time_point> get_reportsteps( const Schedule& s ) {
         std::vector< system_clock::time_point > v;
 
         for( size_t i = 0; i < s.size(); ++i )
@@ -206,7 +206,11 @@ void python::common::export_Schedule(py::module& module) {
     .def(py::init<const Deck&, const EclipseState& >())
     .def_property_readonly( "start",  &get_start_time )
     .def_property_readonly( "end",    &get_end_time )
-    .def_property_readonly( "timesteps", &get_timesteps )
+    .def_property_readonly("reportsteps", &get_reportsteps, R"(
+    Return a list containing the start times of all report steps.
+    Returns:
+        list: A list containing the start times of all report steps.
+    )")
     .def("__len__", &Schedule::size)
     .def("__getitem__", &getitem)
     .def("shut_well", py::overload_cast<const std::string&, std::size_t>(&Schedule::shut_well), py::arg("well_name"), py::arg("step"), R"(
