@@ -37,14 +37,38 @@ void python::common::export_Well(py::module& module) {
     py::class_< Well >( module, "Well")
         .def_property_readonly( "name", &Well::name )
         .def_property_readonly( "preferred_phase", &preferred_phase )
-        .def( "pos",             &get_pos )
+        .def( "pos",             &get_pos, R"(
+        Retrieve the position of the well.
+
+        Returns:
+            tuple: A tuple containing the (i, j) coordinates and the reference depth of the well.
+        )")
         .def( "status",          &status )
-        .def( "isdefined",       &Well::hasBeenDefined )
+        .def( "isdefined",       &Well::hasBeenDefined, R"(
+        Check if the well is defined at a specific report step.
+
+        Args:
+            report_step (int): The report step to check for the well's definition.
+
+        Returns:
+            bool: True if the well is defined at the specified report step, False otherwise.
+        )")
         .def( "isinjector",      &Well::isInjector )
         .def( "isproducer",      &Well::isProducer )
         .def( "group",           &Well::groupName )
         .def( "guide_rate",      &Well::getGuideRate )
-        .def( "available_gctrl", &Well::isAvailableForGroupControl )
-        .def( "connections",     &connections );
+        .def( "available_gctrl", &Well::isAvailableForGroupControl, R"(
+        Check if the well is available for group control.
+
+        Returns:
+            bool: True if the well is available for group control, False otherwise.
+        )")
+        .def( "connections",     &connections, R"(
+        Get a list of all connections associated with the well.
+
+        Returns:
+            list: A list containing all connections of the well.
+        )")
+        ;
 
 }
