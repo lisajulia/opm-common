@@ -48,16 +48,88 @@ void python::common::export_SummaryState(py::module& module) {
         )pbdoc")
         .def(py::init<std::time_t>())
         .def("update", &SummaryState::update)
-        .def("update_well_var", &SummaryState::update_well_var)
-        .def("update_group_var", &SummaryState::update_group_var)
-        .def("well_var", py::overload_cast<const std::string&, const std::string&>(&SummaryState::get_well_var, py::const_))
-        .def("group_var", py::overload_cast<const std::string&, const std::string&>(&SummaryState::get_group_var, py::const_))
-        .def("elapsed", &SummaryState::get_elapsed)
-        .def_property_readonly("groups", groups)
-        .def_property_readonly("wells", wells)
+        .def("update_well_var", &SummaryState::update_well_var, R"(
+        Update the variable of a well.
+
+        Args:
+            well_name (str): The name of the well.
+            variable_name (str): The name of the variable to update.
+            new_value (double): The new value of the variable.
+
+        Returns:
+            None
+        )")
+        .def("update_group_var", &SummaryState::update_group_var, R"(
+        Update the variable of a group.
+
+        Args:
+            group_name (str): The name of the group.
+            variable_name (str): The name of the variable to update.
+            new_value (double): The new value of the variable.
+
+        Returns:
+            None
+        )")
+        .def("well_var", py::overload_cast<const std::string&, const std::string&>(&SummaryState::get_well_var, py::const_), R"(
+        Get the value of a variable for a well.
+
+        Args:
+            well_name (str): The name of the well.
+            variable_name (str): The name of the variable to retrieve.
+
+        Returns:
+            double: The value of the specified variable for the well.
+        )")
+        .def("group_var", py::overload_cast<const std::string&, const std::string&>(&SummaryState::get_group_var, py::const_), R"(
+        Get the value of a variable for a group.
+
+        Args:
+            group_name (str): The name of the group.
+            variable_name (str): The name of the variable to retrieve.
+
+        Returns:
+            double: The value of the specified variable for the group.
+        )")
+        .def("elapsed", &SummaryState::get_elapsed, R"(
+        Return the elapsed time in seconds of the current simulation.
+
+        Returns:
+            double: The elapsed time in seconds.
+        )")
+        .def_property_readonly("groups", groups, R"(
+        Return a list of strings containing all group names.
+
+        Returns:
+            list: A list of strings representing all group names.
+        )")
+        .def_property_readonly("wells", wells, R"(
+        Return a list of strings containing all well names.
+
+        Returns:
+            list: A list of strings representing all well names.
+        )")
         .def("__contains__", &SummaryState::has)
-        .def("has_well_var", py::overload_cast<const std::string&, const std::string&>(&SummaryState::has_well_var, py::const_))
-        .def("has_group_var", py::overload_cast<const std::string&, const std::string&>(&SummaryState::has_group_var, py::const_))
+        .def("has_well_var", py::overload_cast<const std::string&, const std::string&>(&SummaryState::has_well_var, py::const_),R"(
+        Check if a well variable exists.
+
+        Args:
+            well_name (str): The name of the well.
+            variable_name (str): The name of the variable to check.
+
+        Returns:
+            bool: True if the variable exists for the well, False otherwise.
+        )")
+        .def("has_group_var", py::overload_cast<const std::string&, const std::string&>(&SummaryState::has_group_var, py::const_), R"(
+        Check if a group variable exists.
+
+        Args:
+            group_name (str): The name of the group.
+            variable_name (str): The name of the variable to check.
+
+        Returns:
+            bool: True if the variable exists for the group, False otherwise.
+        )")
         .def("__setitem__", &SummaryState::set)
-        .def("__getitem__", py::overload_cast<const std::string&>(&SummaryState::get, py::const_));
+        .def("__getitem__", py::overload_cast<const std::string&>(&SummaryState::get, py::const_))
+        ;
 }
