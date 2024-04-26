@@ -111,14 +111,47 @@ void python::common::export_EclipseState(py::module& module) {
         .def_property_readonly( "title", &EclipseState::getTitle )
         .def( "field_props",    &get_field_props, ref_internal)
         .def( "grid",           &EclipseState::getInputGrid, ref_internal)
+        .def( "input_nnc",      &getNNC, R"(
+        Returns a list of non-neighboring connections. 
+
+        One non-neighboring connection is a tuple containing the following elements:
+            - index1 (int): Index of the first cell.
+            - index2 (int): Index of the second cell.
+            - transmissibility (double): Transmissibility between the two cells.
+
+        Returns:
+            list: A list of non-neighboring connections.
+        )")
+        .def( "faultNames",     &faultNames, R"(
+        Returns a list of fault names.
+
+        Returns:
+            list: A list containing the names of faults.
+        )")
+        .def( "faultFaces",     &faultFaces, R"(
+        Returns a list of faces of a fault with the given name.
+
+        Args:
+            fault_name (str): The name of the fault.
+
+        Returns:
+            list: A list containing the faces of the specified fault.
+        )")
+        .def( "jfunc",          &jfunc, R"(
+        Function returning a dictionary with the following entries: ["FLAG", "DIRECTION", "ALPHA_FACTOR", "BETA_FACTOR", "OIL_WATER", "GAS_OIL"]
+
+        Returns:
+            dict: A dictionary containing the specified entries.
+        )")
+        .def( "simulation",     &EclipseState::getSimulationConfig, ref_internal, R"(
+        Returns the simulation configuration.
+
+        Returns:
+            SimulationConfiguration: The simulation configuration.
+        )")
         .def( "config",         &EclipseState::cfg, ref_internal)
         .def( "tables",         &EclipseState::getTableManager, ref_internal)
         .def( "has_input_nnc",  &EclipseState::hasInputNNC )
-        .def( "simulation",     &EclipseState::getSimulationConfig, ref_internal)
-        .def( "input_nnc",      &getNNC )
-        .def( "faultNames",     &faultNames )
-        .def( "faultFaces",     &faultFaces )
-        .def( "jfunc",          &jfunc )
         ;
 
 }
