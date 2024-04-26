@@ -204,7 +204,6 @@ void python::common::export_Schedule(py::module& module) {
         the SCHEDULE section, notably all well and group information and the timestepping.
     )pbdoc")
     .def(py::init<const Deck&, const EclipseState& >())
-    .def("_groups", &get_groups )
     .def_property_readonly( "start",  &get_start_time )
     .def_property_readonly( "end",    &get_end_time )
     .def_property_readonly( "timesteps", &get_timesteps )
@@ -276,15 +275,59 @@ void python::common::export_Schedule(py::module& module) {
     Returns:
         None
     )")
-    .def( "get_wells", &Schedule::getWells)
-    .def( "get_injection_properties", &get_injection_properties, py::arg("well_name"), py::arg("report_step"))
-    .def( "get_production_properties", &get_production_properties, py::arg("well_name"), py::arg("report_step"))
-    .def("well_names", py::overload_cast<const std::string&>(&Schedule::wellNames, py::const_))
-    .def( "get_well", &get_well)
-    .def( "insert_keywords", py::overload_cast<Schedule&, py::list&, std::size_t>(&insert_keywords), py::arg("keywords"), py::arg("step"))
-    .def( "insert_keywords", py::overload_cast<Schedule&, const std::string&, std::size_t, const UnitSystem&>(&insert_keywords), py::arg("data"), py::arg("step"), py::arg("unit_system"))
-    .def( "insert_keywords", py::overload_cast<Schedule&, const std::string&, std::size_t>(&insert_keywords), py::arg("data"), py::arg("step"))
-    .def( "insert_keywords", py::overload_cast<Schedule&, const std::string&>(&insert_keywords),py::arg("data"))
-    .def( "__contains__", &has_well );
+    .def("get_injection_properties", &get_injection_properties, py::arg("well_name"), py::arg("report_step"), R"(
+    Get injection properties for a well at a specific report step.
 
+    Args:
+        well_name (str): The name of the well.
+        report_step (int): The report step to retrieve properties for.
+
+    Returns:
+        dict: A dict containing the properties surf_inj_rate, resv_inj_rate, bhp_target, thp_target.
+    )")
+    .def("get_production_properties", &get_production_properties, py::arg("well_name"), py::arg("report_step"),R"(
+    Get production properties for a well at a specific report step.
+
+    Args:
+        well_name (str): The name of the well.
+        report_step (int): The report step to retrieve properties for.
+
+    Returns:
+        dict: A dict containing the properties oil_rate, gas_rate, water_rate, liquid_rate, resv_rate, bhp_target, thp_target, alq_value.
+    )")
+    .def("well_names", py::overload_cast<const std::string&>(&Schedule::wellNames, py::const_))
+    .def("insert_keywords", py::overload_cast<Schedule&, py::list&, std::size_t>(&insert_keywords), py::arg("keywords"), py::arg("step"))
+    .def("insert_keywords", py::overload_cast<Schedule&, const std::string&, std::size_t, const UnitSystem&>(&insert_keywords), py::arg("data"), py::arg("step"), py::arg("unit_system"))
+    .def("insert_keywords", py::overload_cast<Schedule&, const std::string&, std::size_t>(&insert_keywords), py::arg("data"), py::arg("step"))
+    .def("insert_keywords", py::overload_cast<Schedule&, const std::string&>(&insert_keywords),py::arg("data"))
+    .def("__contains__", &has_well )
+    .def("_groups", &get_groups,R"(
+    Get a list of all groups at a specified report step.
+
+    Args:
+        report_step (int): The report step to retrieve groups for.
+
+    Returns:
+        list: A list containing all groups at the specified report step.
+    )")
+    .def( "get_well", &get_well, R"(
+    Retrieve a well at a given report step.
+
+    Args:
+        well_name (str): The name of the well.
+        report_step (int): The report step.
+
+    Returns:
+        well: Well object at the given report step.
+    )")
+    .def( "get_wells", &Schedule::getWells, R"(
+    Get the names of wells matching a specified pattern.
+
+    Args:
+        well_name_pattern (str): The pattern for well names, where '*' acts as a wildcard.
+
+    Returns:
+        list: A list containing the names of wells that match the specified pattern.
+    )")
+    ;
 }
