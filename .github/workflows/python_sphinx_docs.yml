@@ -1,0 +1,39 @@
+
+name: Build Python Sphinx Docs and push to gh-pages
+
+on:
+    push:
+        branches: master
+        paths:
+          - 'python/docstrings_common.json'
+          - '.github/workflows/python_sphinx_docs.yml'
+    pull_request:
+        branches: master
+        paths:
+          - 'python/docstrings_common.json'
+          - '.github/workflows/python_sphinx_docs.yml'
+permissions:
+    contents: write
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout opm-common source code
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0   # Fetch all history for all tags and branches
+        - name: Checkout opm-simulators source code, current master
+          run: |
+            git clone https://github.com/OPM/opm-simulators
+        - name: Push docstrings_common.json to opm-simulators
+          uses: lisajulia/github-action-push-to-another-repository@main
+          env:
+            SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+          with:
+            source-files: 'python/docstrings_common.json'
+            target-directory: 'python'
+            target-branch: master
+            destination-github-username: 'lisajulia'
+            destination-repository-name: 'opm-simulators'
+            user-email: opm@common.de
+            commit-message: 'Update docstrings_common.json to version from current master in opm-common'
