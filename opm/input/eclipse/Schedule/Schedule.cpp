@@ -1764,6 +1764,7 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
                this->completed_cells == data.completed_cells &&
                this->welpi_action_mode == data.welpi_action_mode &&
                this->current_report_step == data.current_report_step &&
+               this->m_wellPIMap == data.m_wellPIMap &&
                simUpdateFromPythonIsEqual;
      }
 
