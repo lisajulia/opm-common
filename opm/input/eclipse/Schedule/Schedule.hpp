@@ -290,6 +290,7 @@ namespace Opm
             serializer(this->completed_cells);
             serializer(this->m_treat_critical_as_non_critical);
             serializer(this->current_report_step);
+            serializer(this->welpi_action_mode);
             serializer(this->simUpdateFromPython);
 
             this->template pack_unpack<PAvg>(serializer);
@@ -470,6 +471,9 @@ namespace Opm
         WriteRestartFileEvents restart_output{};
         CompletedCells completed_cells{};
 
+        // The action mode is set to true when a PYACTION call is executed, when the PYACTION execution is
+        // over, it is set to false again. This is needed for handling the keyword WELPI from a PYACTION.
+        bool welpi_action_mode = false;
         // The current_report_step is set to the current report step when a PYACTION call is executed.
         // This is needed since the Schedule object does not know the current report step of the simulator and
         // we only allow PYACTIONS for the current and future report steps. 
