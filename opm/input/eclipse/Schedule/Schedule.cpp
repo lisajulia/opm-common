@@ -258,6 +258,7 @@ Schedule::Schedule(const Deck& deck, const EclipseState& es, const std::optional
         result.m_treat_critical_as_non_critical = false;
         result.m_static = ScheduleStatic::serializationTestObject();
         result.m_sched_deck = ScheduleDeck::serializationTestObject();
+        result.m_wellPIMap = {{"WELL1", 1000}, {"WELL2", 2000}};
         result.action_wgnames = Action::WGNames::serializationTestObject();
         result.exit_status = EXIT_FAILURE;
         result.snapshots = { ScheduleState::serializationTestObject() };
@@ -1437,7 +1438,6 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
         ErrorGuard errors;
         ScheduleGrid grid(this->completed_cells);
         SimulatorUpdate sim_update;
-        std::unordered_map<std::string, double> target_wellpi;
         std::vector<std::string> matching_wells;
         const std::string prefix = "| "; /* logger prefix string */
         this->snapshots.resize(reportStep + 1);
@@ -1454,7 +1454,7 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
                                     grid,
                                     matching_wells,
                                     &sim_update,
-                                    &target_wellpi,
+                                    &(this->m_wellPIMap),
                                     wpimult_global_factor);    
             } else {
                 const std::string msg_fmt = fmt::format("The keyword {} is not supported for inserting it from Python into a simulation", keyword->name());
@@ -1664,6 +1664,10 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
         this->welpi_action_mode = false;
         return *(this->simUpdateFromPython);
     }
+
+    void Schedule::setWellPIMap(std::unordered_map<std::string, double> wellPIMap)  {
+            this->m_wellPIMap = wellPIMap;
+        }
 
     void Schedule::applyWellProdIndexScaling(const std::string& well_name, const std::size_t reportStep, const double newWellPI) {
         if (reportStep >= this->snapshots.size())
