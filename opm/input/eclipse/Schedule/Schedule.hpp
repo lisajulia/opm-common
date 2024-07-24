@@ -469,6 +469,7 @@ namespace Opm
         std::vector<ScheduleState> snapshots{};
         WriteRestartFileEvents restart_output{};
         CompletedCells completed_cells{};
+        std::shared_ptr<ScheduleGrid> scheduleGrid{};
 
         // The current_report_step is set to the current report step when a PYACTION call is executed.
         // This is needed since the Schedule object does not know the current report step of the simulator and

@@ -141,25 +141,25 @@ namespace Opm {
         this->simUpdateFromPython = std::make_shared<SimulatorUpdate>();
 
         //const ScheduleGridWrapper gridWrapper { grid } ;
-        ScheduleGrid grid(ecl_grid, fp, this->completed_cells);
+        this->scheduleGrid = std::make_shared<ScheduleGrid>(ecl_grid, fp, this->completed_cells);
 
         if (rst) {
             if (!tracer_config)
                 throw std::logic_error("Bug: when loading from restart a valid TracerConfig object must be supplied");
 
             auto restart_step = this->m_static.rst_info.report_step;
-            this->iterateScheduleSection( 0, restart_step, parseContext, errors, grid, nullptr, "");
-            this->load_rst(*rst, *tracer_config, grid, fp);
+            this->iterateScheduleSection( 0, restart_step, parseContext, errors, *scheduleGrid, nullptr, "");
+            this->load_rst(*rst, *tracer_config, *scheduleGrid, fp);
             if (! this->restart_output.writeRestartFile(restart_step))
                 this->restart_output.addRestartOutput(restart_step);
-            this->iterateScheduleSection( restart_step, this->m_sched_deck.size(), parseContext, errors, grid, nullptr, "");
+            this->iterateScheduleSection( restart_step, this->m_sched_deck.size(), parseContext, errors, *scheduleGrid, nullptr, "");
             // Events added during restart reading well be added to previous step, but need to be active at the
             // restart step to ensure well potentials and guide rates are available at the first step.
             const auto prev_step = std::max(static_cast<int>(restart_step-1), 0);
             this->snapshots[restart_step].update_wellgroup_events(this->snapshots[prev_step].wellgroup_events());
             this->snapshots[restart_step].update_events(this->snapshots[prev_step].events());
         } else {
-            this->iterateScheduleSection( 0, this->m_sched_deck.size(), parseContext, errors, grid, nullptr, "");
+            this->iterateScheduleSection( 0, this->m_sched_deck.size(), parseContext, errors, *scheduleGrid, nullptr, "");
         }
     }
     catch (const OpmInputError& opm_error) {
@@ -1436,7 +1436,6 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
         }
         ParseContext parseContext;
         ErrorGuard errors;
-        ScheduleGrid grid(this->completed_cells);
         SimulatorUpdate sim_update;
         std::unordered_map<std::string, double> target_wellpi;
         std::vector<std::string> matching_wells;
@@ -1452,7 +1451,7 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
                                     *keyword,
                                     parseContext,
                                     errors,
-                                    grid,
+                                    *(this->scheduleGrid),
                                     matching_wells,
                                     /*actionx_mode=*/false,
                                     &sim_update,
@@ -1471,7 +1470,7 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
                 this->m_sched_deck.size(),
                 parseContext,
                 errors,
-                grid,
+                *(this->scheduleGrid),
                 &target_wellpi,
                 prefix);
         }
