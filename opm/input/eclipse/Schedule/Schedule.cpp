@@ -588,7 +588,12 @@ void Schedule::iterateScheduleSection(std::size_t load_start, std::size_t load_e
                         if (action_keyword.is<ParserKeywords::ENDACTIO>())
                             break;
 
-                        if (Action::ActionX::valid_keyword(action_keyword.name())){
+                        bool valid = Action::ActionX::valid_keyword(action_keyword.name());
+                        bool lowActionParsingStrictness = false;
+                        if (lowActionParsingStrictness or valid){
+                            if (lowActionParsingStrictness and !valid) {
+                                logger(fmt::format("The keyword {} is not supported in the ACTIONX block, but you have set --action-parsing-strictness = low, so flow will try to apply the keyword still.", action_keyword.name()));
+                            }
                             action.addKeyword(action_keyword);
                             this->prefetch_cell_properties(grid, action_keyword);
                             this->store_wgnames(action_keyword);
@@ -1444,8 +1449,16 @@ File {} line {}.)", pattern, location.keyword, location.filename, location.linen
         this->snapshots.resize(reportStep + 1);
         auto& input_block = this->m_sched_deck[reportStep];
         std::unordered_map<std::string, double> wpimult_global_factor;
+        ScheduleLogger logger(ScheduleLogger::select_stream(true, true),
+                              prefix, this->m_sched_deck.location());
+        
         for (auto& keyword : keywords) {
-            if (Action::PyAction::valid_keyword(keyword->name())) {
+            bool valid = Action::PyAction::valid_keyword(keyword->name());
+            bool lowActionParsingStrictness = false;
+            if (lowActionParsingStrictness or valid) {
+                if (lowActionParsingStrictness and !valid) {
+                    logger(fmt::format("The keyword {} is not supported for inserting it from Python into a simulation, but you have set --action-parsing-strictness = low, so flow will try to apply the keyword still.", keyword->name()));
+                }
                 input_block.push_back(*keyword);
                 this->handleKeyword(reportStep,
                                     input_block,
