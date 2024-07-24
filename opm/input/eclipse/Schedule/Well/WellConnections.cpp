@@ -32,6 +32,7 @@
 
 #include <opm/input/eclipse/Schedule/ScheduleGrid.hpp>
 #include <opm/input/eclipse/Schedule/Well/Connection.hpp>
+#include <opm/input/eclipse/Schedule/Well/PossibleFutureConnection.hpp>
 #include <opm/input/eclipse/Schedule/Well/WDFAC.hpp>
 #include <opm/input/eclipse/Schedule/WellTraj/RigEclipseWellLogExtractor.hpp>
 

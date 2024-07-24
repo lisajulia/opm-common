@@ -1167,6 +1167,10 @@ const std::vector<const Connection *> Well::getConnections(int completion) const
     return connvector;
 }
 
+const std::vector<const PossibleFutureConnection *> Well::getPossibleFutureConnections() const {
+    return this->possibleFutureConnections;
+}
+
 const WellFoamProperties& Well::getFoamProperties() const {
     return *this->foam_properties;
 }

@@ -35,6 +35,7 @@
 #include <opm/input/eclipse/Schedule/ScheduleTypes.hpp>
 #include <opm/input/eclipse/Schedule/VFPProdTable.hpp>
 #include <opm/input/eclipse/Schedule/Well/Connection.hpp>
+#include <opm/input/eclipse/Schedule/Well/PossibleFutureConnection.hpp>
 #include <opm/input/eclipse/Schedule/Well/PAvg.hpp>
 #include <opm/input/eclipse/Schedule/Well/WellEnums.hpp>
 #include <opm/input/eclipse/Schedule/Well/WellInjectionControls.hpp>
@@ -443,8 +444,10 @@ public:
     bool aciveWellInjMult() const;
 
     bool hasConnections() const;
+    // There are two types of connections: actual connections and possible future connections (for the case where a connection is created using an ACTIONX-keyword)
     const std::vector<const Connection *> getConnections(int completion) const;
     const WellConnections& getConnections() const;
+    const std::vector<const PossibleFutureConnection *> getPossibleFutureConnections() const;
     const WellSegments& getSegments() const;
     int maxSegmentID() const;
     int maxBranchID() const;
@@ -652,6 +655,7 @@ private:
     std::shared_ptr<WellBrineProperties> brine_properties;
     std::shared_ptr<WellTracerProperties> tracer_properties;
     std::shared_ptr<WellConnections> connections; // The WellConnections object cannot be const because of WELPI and the filterConnections method
+    std::vector<const PossibleFutureConnection *> possibleFutureConnections;
     std::shared_ptr<WellProductionProperties> production;
     std::shared_ptr<WellInjectionProperties> injection;
     std::shared_ptr<WellSegments> segments;
