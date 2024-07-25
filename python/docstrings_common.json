@@ -2,7 +2,7 @@
     "SummaryStateClass":{
         "type": "class",
         "signature": "opm.io.sim.SummaryState",
-        "doc": "The SummaryState class - this is where the current summary results of the simulator are stored.\nThe SummaryState class has methods to get hold of well, group and general variables."
+        "doc": "The SummaryState class - this is where the current summary results of the simulator are stored.\nThe SummaryState class has methods to get hold of well, group and general variables. bla blubber"
     },
     "SummaryState_update_well_var": {
         "signature": "opm.io.sim.SummaryState.update_well_var(well_name: str, variable_name: str, new_value: double) -> None",
