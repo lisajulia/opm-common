@@ -20,6 +20,8 @@
 
 namespace {
 
+    py::module opm_embedded = py::module::import("opm_embedded");
+
     using system_clock = std::chrono::system_clock;
 
 
@@ -159,22 +161,40 @@ namespace {
         }
         return keywords;
     }
+
+    std::unordered_map<std::string, double> getTargetWellPI() {
+        py::object target_wellpi_obj = opm_embedded.attr("_target_wellpi");
+        return target_wellpi_obj.cast<std::unordered_map<std::string, double>>();
+    }
+
+
+    std::unordered_map<std::string, double> possiblyGetTargetWellPI(const std::string& deck_string) {
+        if (deck_string.find("WELPI") != std::string::npos || deck_string.find("WPIMULT") != std::string::npos) {
+            py::object target_wellpi_obj = opm_embedded.attr("_target_wellpi");
+            return target_wellpi_obj.cast<std::unordered_map<std::string, double>>();
+        }
+        return {}; // Return an empty map if keywords that use the target_wellpi map are not present
+    }
+
     void insert_keywords(Schedule& sch, const std::string& deck_string, std::size_t report_step, const UnitSystem& unit_system)
     {
         auto kws = parseKeywords(deck_string, unit_system);
-        sch.applyKeywords(kws, report_step);
+        auto target_wellpi = possiblyGetTargetWellPI(deck_string);
+        sch.applyKeywords(kws, target_wellpi, report_step);
     }
 
     void insert_keywords(Schedule& sch, const std::string& deck_string, std::size_t report_step)
     {
         auto kws = parseKeywords(deck_string,sch.getUnits());
-        sch.applyKeywords(kws, report_step);
+        auto target_wellpi = possiblyGetTargetWellPI(deck_string);
+        sch.applyKeywords(kws, target_wellpi, report_step);
     }
 
     void insert_keywords(Schedule& sch, const std::string& deck_string)
     {
         auto kws = parseKeywords(deck_string,sch.getUnits());
-        sch.applyKeywords(kws);
+        auto target_wellpi = possiblyGetTargetWellPI(deck_string);
+        sch.applyKeywords(kws, target_wellpi);
     }
 
     // NOTE: this overload does currently not work, see PR #2833. The plan
@@ -185,11 +205,19 @@ namespace {
         Schedule& sch, py::list& deck_keywords, std::size_t report_step)
     {
         std::vector<std::unique_ptr<DeckKeyword>> keywords;
+        bool contains_wellpi_keywords = false;
+
         for (py::handle item : deck_keywords) {
             DeckKeyword &keyword = item.cast<DeckKeyword&>();
             keywords.push_back(std::make_unique<DeckKeyword>(keyword));
+            const std::string& keyword_name = keyword.name();
+            if (keyword_name == "WELPI" || keyword_name == "WPIMULT") {
+                contains_wellpi_keywords = true;
+            }
         }
-        sch.applyKeywords(keywords, report_step);
+        // Return an empty map if keywords that use the target_wellpi map are not present
+        auto target_wellpi = contains_wellpi_keywords ? getTargetWellPI() : std::unordered_map<std::string, double>{};
+        sch.applyKeywords(keywords, target_wellpi, report_step);
     }
 }
 

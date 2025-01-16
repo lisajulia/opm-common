@@ -66,8 +66,9 @@ BOOST_AUTO_TEST_CASE(ParsePYACTION_Module_Syntax_Error) {
     Schedule schedule;
     SummaryState summary_state;
     const std::function<void(const std::string&, const std::vector<std::string>&)> actionx_callback;
+    std::unordered_map<std::string, double> target_wellpi = {};
 
-    BOOST_CHECK_THROW(pyaction2.run(state, schedule, 0, summary_state, actionx_callback), std::exception);
+    BOOST_CHECK_THROW(pyaction2.run(state, schedule, 0, summary_state, actionx_callback, target_wellpi), std::exception);
 }
 
 BOOST_AUTO_TEST_CASE(ParsePYACTION_ModuleMissing) {

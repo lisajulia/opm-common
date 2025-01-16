@@ -145,10 +145,11 @@ void msim::post_step(data::Solution& /* sol */,
                                        std::unordered_map<std::string,double>{});
         }
     }
+    std::unordered_map<std::string, double> target_wellpi = {};
 
     for (const auto& pyaction : actions.pending_python(this->action_state)) {
         this->schedule.runPyAction(report_step, *pyaction,
-                                   this->action_state, this->state, this->st);
+                                   this->action_state, this->state, this->st, target_wellpi);
     }
 }
 
